@@ -27,5 +27,14 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_PORT: Env.schema.number(),
   DB_USER: Env.schema.string(),
   DB_PASSWORD: Env.schema.string.optional(),
-  DB_DATABASE: Env.schema.string()
+  DB_DATABASE: Env.schema.string(),
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring bucket connection
+  |----------------------------------------------------------
+  */
+  BUCKET_KEY_ID:Env.schema.string(),
+  BUCKET_KEY_NAME:Env.schema.string(),
+  BUCKET_ENDPOINT:Env.schema.string(),
+  BUCKET_REGION:Env.schema.string(),
 })
