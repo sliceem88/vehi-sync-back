@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
-import { compose } from '@adonisjs/core/helpers'
+import { compose, cuid } from '@adonisjs/core/helpers'
 import { BaseModel, beforeCreate, column, manyToMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
@@ -62,9 +62,19 @@ export default class User extends compose(BaseModel, AuthFinder) {
   })
   declare relatedTo: relations.ManyToMany<typeof User>
 
+  @column()
+  declare bucket: string | null
+
   @beforeCreate()
   static assignUuid(user: User) {
     user.id = randomUUID()
+  }
+
+  @beforeCreate()
+  static assignBucket(user: User) {
+    if (user.type === UserType.OWNER) {
+      user.bucket = cuid()
+    }
   }
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
