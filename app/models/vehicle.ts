@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, belongsTo, column } from '@adonisjs/lucid/orm'
 import { randomUUID } from 'node:crypto'
+import User from '#models/user'
+import * as relations from '@adonisjs/lucid/types/relations'
 
 export default class Vehicle extends BaseModel {
   public static table = 'vehicles'
@@ -14,8 +16,8 @@ export default class Vehicle extends BaseModel {
   @column()
   declare type: string
 
-  @column()
-  declare year: number
+  @column.dateTime()
+  declare year: DateTime | null
 
   @column()
   declare description: string
@@ -25,6 +27,12 @@ export default class Vehicle extends BaseModel {
 
   @column()
   declare additionalInfo: any
+
+  @column()
+  declare userId: string
+
+  @belongsTo(() => User)
+  declare user: relations.BelongsTo<typeof User>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

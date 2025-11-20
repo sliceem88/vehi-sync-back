@@ -23,8 +23,9 @@ router.group(() => {
     // Constants
     router.get('/constant/all', [ConstantController, 'index'])
 
-    router.post('/vehicles', [VehiclesController, 'create'])
-    router.get('/vehicles/:id', [VehiclesController, 'show'])
+    router.post('/vehicle', [VehiclesController, 'create'])
+    router.get('/vehicle/all', [VehiclesController, 'getAll'])
+    router.get('/vehicle/:id', [VehiclesController, 'show'])
   })
     .middleware(middleware.auth())
 

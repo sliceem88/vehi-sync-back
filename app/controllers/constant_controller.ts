@@ -1,5 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { inject } from '@adonisjs/core'
 
+@inject()
 export default class ConstantController {
   async index(ctx: HttpContext) {
     const accountTypes = [

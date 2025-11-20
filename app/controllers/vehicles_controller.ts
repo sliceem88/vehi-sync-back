@@ -1,20 +1,25 @@
 import Vehicle from '#models/vehicle'
 import type { HttpContext } from '@adonisjs/core/http'
+import { BucketService } from '#services/bucket_service'
+import { inject } from '@adonisjs/core'
 
-
+@inject()
 export default class VehiclesController {
-  /**
-   * Create Vehicle
-   */
-  public async create({ request }: HttpContext) {
+  constructor(protected bucket: BucketService) {
+  }
+
+  public async create({ request, auth }: HttpContext) {
+    const files = request.files('images');
     const data = request.only([
       'name',
       'type',
       'year',
       'description',
       'images',
-      'additional_info',
+      'additionalInfo',
     ])
+
+    console.log('###', data, files);
 
     const vehicle = await Vehicle.create({
       name: data.name,
@@ -22,15 +27,13 @@ export default class VehiclesController {
       year: data.year,
       description: data.description,
       images: data.images,
-      additionalInfo: data.additional_info,
+      additionalInfo: data.additionalInfo,
+      userId: auth.user!.id
     })
 
     return vehicle
   }
 
-  /**
-   * Get Vehicle By ID
-   */
   public async show({ params, response }: HttpContext) {
     const vehicle = await Vehicle.find(params.id)
 
@@ -38,6 +41,16 @@ export default class VehiclesController {
       return response.status(404).json({ message: 'Vehicle not found' })
     }
 
-    return vehicle
+    return response.json(vehicle)
+  }
+
+  public async getAll({ auth, response }: HttpContext) {
+    const vehicles = await Vehicle.findManyBy({ userId: auth.user!.id})
+
+    if (!vehicles) {
+      return response.status(404).json({ message: 'Vehicle not found' })
+    }
+
+    return response.json(vehicles)
   }
 }
