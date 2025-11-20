@@ -1,9 +1,12 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
-import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { compose, cuid } from '@adonisjs/core/helpers'
+import { BaseModel, beforeCreate, column, manyToMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import { UserType } from '#enums/user_type'
+import { randomUUID } from 'node:crypto'
+import * as relations from '@adonisjs/lucid/types/relations'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -12,10 +15,22 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 
 export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
 
   @column()
-  declare fullName: string | null
+  declare name: string | null
+
+  @column()
+  declare surname: string | null
+
+  @column()
+  declare description: string | null
+
+  @column()
+  declare companyName: string | null
+
+  @column()
+  declare type: UserType | null
 
   @column()
   declare email: string
@@ -28,6 +43,39 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+
+  @manyToMany(() => User, {
+    pivotTable: 'user_relations',
+    localKey: 'id',
+    pivotForeignKey: 'user_id',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'related_user_id',
+  })
+  declare relatedUsers: relations.ManyToMany<typeof User>
+
+  @manyToMany(() => User, {
+    pivotTable: 'user_relations',
+    localKey: 'id',
+    pivotForeignKey: 'related_user_id',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'user_id',
+  })
+  declare relatedTo: relations.ManyToMany<typeof User>
+
+  @column()
+  declare bucket: string | null
+
+  @beforeCreate()
+  static assignUuid(user: User) {
+    user.id = randomUUID()
+  }
+
+  @beforeCreate()
+  static assignBucket(user: User) {
+    if (user.type === UserType.OWNER) {
+      user.bucket = cuid()
+    }
+  }
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }
