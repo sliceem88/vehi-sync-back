@@ -20,13 +20,14 @@ router.group(() => {
     // Bucket
     router.get('/bucket/list', [BucketController, 'index'])
     router.get('/bucket/list/all', [BucketController, 'all'])
-    // Constants
-    router.get('/constant/all', [ConstantController, 'index'])
 
     router.post('/vehicle', [VehiclesController, 'create'])
     router.get('/vehicle/all', [VehiclesController, 'getAll'])
     router.get('/vehicle/:id', [VehiclesController, 'show'])
   })
     .middleware(middleware.auth())
+
+  // Constants
+  router.get('/constant/all', [ConstantController, 'index'])
 
 }).prefix('/api')
