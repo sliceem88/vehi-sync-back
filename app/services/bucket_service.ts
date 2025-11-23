@@ -1,7 +1,15 @@
-import { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import {
+  S3Client,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import env from '#start/env'
-
+import * as fs from 'node:fs'
+import path from 'node:path'
+import {unlink}  from "fs/promises"
 
 export class BucketService {
   private readonly s3Client: S3Client
@@ -94,20 +102,30 @@ export class BucketService {
     }
   }
 
+  createFilaPath(bucket: string, filePath: string) {
+    const keyName = path.basename(filePath);
+
+    return `${bucket}/${keyName}`;
+  }
+
   /**
    * Upload a file to the bucket
    */
-  async uploadFile(key: string, body: Buffer | Uint8Array | string, contentType?: string) {
+  async uploadFile(bucket: string, filePath: string) {
+    const fileStream = fs.createReadStream(filePath);
+    const fileName = this.createFilaPath(bucket, filePath)
+
     try {
       const command = new PutObjectCommand({
         Bucket: this.bucketName,
-        Key: key,
-        Body: body,
-        ContentType: contentType,
+        Key: fileName,
+        Body: fileStream,
       })
 
-      const response = await this.s3Client.send(command)
-      return response
+      await this.s3Client.send(command)
+      await unlink(filePath)
+
+      return fileName;
     } catch (error) {
       console.error('Error uploading file:', error)
       throw error
@@ -130,6 +148,17 @@ export class BucketService {
       console.error('Error getting file:', error)
       throw error
     }
+  }
+
+  async getSignedUrlForFile(fileKey: string) {
+    return await getSignedUrl(
+      this.s3Client,
+      new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: fileKey,
+      }),
+      { expiresIn: 360 } // 1 hour
+    );
   }
 
   /**

@@ -9,7 +9,8 @@ export default class VehiclesController {
   }
 
   public async create({ request, auth }: HttpContext) {
-    const files = request.files('images');
+    const file = request.file('images');
+    await file?.move('uploads')
     const data = request.only([
       'name',
       'type',
@@ -19,19 +20,16 @@ export default class VehiclesController {
       'additionalInfo',
     ])
 
-    console.log('###', data, files);
-
-    const vehicle = await Vehicle.create({
+    const fileName = await this.bucket.uploadFile(auth.user!.bucket!, file!.filePath!)
+    return await Vehicle.create({
       name: data.name,
       type: data.type,
       year: data.year,
       description: data.description,
-      images: data.images,
+      images: {fileName: fileName},
       additionalInfo: data.additionalInfo,
       userId: auth.user!.id
     })
-
-    return vehicle
   }
 
   public async show({ params, response }: HttpContext) {
@@ -49,6 +47,10 @@ export default class VehiclesController {
 
     if (!vehicles) {
       return response.status(404).json({ message: 'Vehicle not found' })
+    }
+
+    for (const vehicle of vehicles) {
+      vehicle.images.fileName = await this.bucket.getSignedUrlForFile(vehicle.images.fileName)
     }
 
     return response.json(vehicles)
