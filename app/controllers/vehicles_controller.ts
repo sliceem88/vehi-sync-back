@@ -2,6 +2,7 @@ import Vehicle from '#models/vehicle'
 import type { HttpContext } from '@adonisjs/core/http'
 import { BucketService } from '#services/bucket_service'
 import { inject } from '@adonisjs/core'
+import { StatusCodes } from 'http-status-codes'
 
 @inject()
 export default class VehiclesController {
@@ -10,6 +11,7 @@ export default class VehiclesController {
 
   public async create({ request, auth }: HttpContext) {
     const file = request.file('images');
+    console.log('file', file);
     await file?.move('uploads')
     const data = request.only([
       'name',
@@ -36,7 +38,7 @@ export default class VehiclesController {
     const vehicle = await Vehicle.find(params.id)
 
     if (!vehicle) {
-      return response.status(404).json({ message: 'Vehicle not found' })
+      return response.status(StatusCodes.NOT_FOUND).json({ message: 'Vehicle not found' })
     }
 
     return response.json(vehicle)
@@ -46,7 +48,7 @@ export default class VehiclesController {
     const vehicles = await Vehicle.findManyBy({ userId: auth.user!.id})
 
     if (!vehicles) {
-      return response.status(404).json({ message: 'Vehicle not found' })
+      return response.status(StatusCodes.NOT_FOUND).json({ message: 'Vehicle not found' })
     }
 
     for (const vehicle of vehicles) {
@@ -55,4 +57,15 @@ export default class VehiclesController {
 
     return response.json(vehicles)
   }
+
+  public async delete({ params, response }: HttpContext) {
+    const vehicle  = await Vehicle.find(params.id);
+
+    if (!vehicle) {
+      return response.status(StatusCodes.NOT_FOUND).json({ message: 'Vehicle not found' })
+    }
+
+    await vehicle.delete(); // Soft Delete
+
+    return response.json(vehicle)  }
 }
