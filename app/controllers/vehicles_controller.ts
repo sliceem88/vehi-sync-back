@@ -11,7 +11,7 @@ export default class VehiclesController {
 
   public async create({ request, auth }: HttpContext) {
     const file = request.file('images');
-    console.log('###', request);
+    console.log('###', file);
     let fileName = '';
 
     const data = request.only([
@@ -57,7 +57,9 @@ export default class VehiclesController {
     }
 
     for (const vehicle of vehicles) {
-      vehicle.images.fileName = await this.bucket.getSignedUrlForFile(vehicle.images.fileName)
+      if(vehicle.images.fileName) {
+        vehicle.images.fileName = await this.bucket.getSignedUrlForFile(vehicle.images.fileName)
+      }
     }
 
     return response.json(vehicles)
