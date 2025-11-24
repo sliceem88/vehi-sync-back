@@ -11,7 +11,7 @@ export default class VehiclesController {
 
   public async create({ request, auth }: HttpContext) {
     const file = request.file('images');
-    console.log('###', request);
+    console.log('###', file);
     let fileName = '';
 
     const data = request.only([
