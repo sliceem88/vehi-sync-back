@@ -60,7 +60,9 @@
     "@aws-sdk/client-s3": "^3.919.0",
     "@aws-sdk/s3-request-presigner": "^3.919.0",
     "@vinejs/vine": "^3.0.1",
+    "adonis-lucid-soft-deletes": "^2.1.0",
     "aws-sdk": "^2.1692.0",
+    "http-status-codes": "^2.3.0",
     "luxon": "^3.7.2",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2"

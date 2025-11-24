@@ -3,8 +3,10 @@ import { BaseModel, beforeCreate, belongsTo, column } from '@adonisjs/lucid/orm'
 import { randomUUID } from 'node:crypto'
 import User from '#models/user'
 import * as relations from '@adonisjs/lucid/types/relations'
+import { compose } from '@adonisjs/core/helpers'
+import { SoftDeletes } from 'adonis-lucid-soft-deletes'
 
-export default class Vehicle extends BaseModel {
+export default class Vehicle extends compose(BaseModel, SoftDeletes) {
   public static table = 'vehicles'
 
   @column({ isPrimary: true })
@@ -39,6 +41,9 @@ export default class Vehicle extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+
+  @column.dateTime({ columnName: 'deleted_at' })
+  declare deletedAt: DateTime | null
 
   @beforeCreate()
   static assignUuid(vehicle: Vehicle) {

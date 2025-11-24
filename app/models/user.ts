@@ -7,13 +7,14 @@ import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import { UserType } from '#enums/user_type'
 import { randomUUID } from 'node:crypto'
 import * as relations from '@adonisjs/lucid/types/relations'
+import { SoftDeletes } from 'adonis-lucid-soft-deletes'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
   passwordColumnName: 'password',
 })
 
-export default class User extends compose(BaseModel, AuthFinder) {
+export default class User extends compose(BaseModel, AuthFinder, SoftDeletes) {
   @column({ isPrimary: true })
   declare id: string
 
@@ -64,6 +65,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column()
   declare bucket: string | null
+
+  @column.dateTime({ columnName: 'deleted_at' })
+  declare deletedAt: DateTime | null
 
   @beforeCreate()
   static assignUuid(user: User) {

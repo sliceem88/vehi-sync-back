@@ -24,6 +24,7 @@ router.group(() => {
     router.post('/vehicle', [VehiclesController, 'create'])
     router.get('/vehicle/all', [VehiclesController, 'getAll'])
     router.get('/vehicle/:id', [VehiclesController, 'show'])
+    router.delete('/vehicle/:id', [VehiclesController, 'delete'])
   })
     .middleware(middleware.auth())
 
