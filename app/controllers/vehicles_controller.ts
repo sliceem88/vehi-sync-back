@@ -11,8 +11,9 @@ export default class VehiclesController {
 
   public async create({ request, auth }: HttpContext) {
     const file = request.file('images');
-    console.log('file', file);
-    await file?.move('uploads')
+    console.log('###', request);
+    let fileName = '';
+
     const data = request.only([
       'name',
       'type',
@@ -22,7 +23,11 @@ export default class VehiclesController {
       'additionalInfo',
     ])
 
-    const fileName = await this.bucket.uploadFile(auth.user!.bucket!, file!.filePath!)
+    if(file) {
+      await file?.move('uploads')
+      fileName = await this.bucket.uploadFile(auth.user!.bucket!, file?.filePath!)
+    }
+
     return await Vehicle.create({
       name: data.name,
       type: data.type,
