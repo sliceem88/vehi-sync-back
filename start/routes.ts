@@ -4,6 +4,7 @@ import { BucketController } from '#controllers/bucket_controller'
 import ConstantController from '#controllers/constant_controller'
 import UserController from '#controllers/user_controller'
 import VehiclesController from '#controllers/vehicles_controller'
+import ServicesController from '#controllers/services_controller'
 
 
 
@@ -21,6 +22,10 @@ router.group(() => {
     router.get('/bucket/list', [BucketController, 'index'])
     router.get('/bucket/list/all', [BucketController, 'all'])
 
+    //Services
+    router.get('/service/all', [ServicesController, 'show'])
+
+    // Vehicle
     router.post('/vehicle', [VehiclesController, 'create'])
     router.get('/vehicle/all', [VehiclesController, 'getAll'])
     router.get('/vehicle/:id', [VehiclesController, 'show'])
