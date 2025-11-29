@@ -24,6 +24,9 @@ router.group(() => {
 
     //Services
     router.get('/service/all', [ServicesController, 'show'])
+    router.post('/service/owner/:serviceId', [ServicesController, 'assignOwner'])
+    router.get('/service/owner', [ServicesController, 'getAssignedServices'])
+    router.delete('/service/owner/:serviceId', [ServicesController, 'deleteAssignedService'])
 
     // Vehicle
     router.post('/vehicle', [VehiclesController, 'create'])

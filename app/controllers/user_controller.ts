@@ -15,18 +15,24 @@ export default class UserController {
   async login({ request }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
     const user = await User.verifyCredentials(email, password)
+    const data = await User.accessTokens.create(user);
 
-    return User.accessTokens.create(user)
+    return {
+      ...data.toJSON(),
+      userType: user.type,
+    }
   }
 
   async logout({ auth }: HttpContext) {
     const user = auth.user!
     await User.accessTokens.delete(user, user.currentAccessToken.identifier)
+
     return { message: 'success' }
   }
 
   async me({ auth }: HttpContext) {
     await auth.check()
+
     return {
       user: auth.user,
     }
