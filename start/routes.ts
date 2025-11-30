@@ -6,6 +6,7 @@ import UserController from '#controllers/user_controller'
 import VehiclesController from '#controllers/vehicles_controller'
 import ServicesController from '#controllers/services_controller'
 import OwnersController from '#controllers/owner_controller.'
+import MechanicController from '#controllers/mechanic_controller'
 
 
 
@@ -25,12 +26,17 @@ router.group(() => {
 
     //Services
     router.get('/service/all', [ServicesController, 'show'])
-    router.post('/service/owner/:serviceId', [ServicesController, 'assignOwner'])
+    router.post('/service/owner/:serviceId', [ServicesController, 'assignVehicleOwner'])
     router.get('/service/owner', [ServicesController, 'getAssignedServices'])
     router.delete('/service/owner/:serviceId', [ServicesController, 'deleteAssignedService'])
+    router.post('/service/mechanic/', [ServicesController, 'addMechanicToService'])
+    router.get('/service/mechanic/', [ServicesController, 'getMechanics'])
 
     //Owners
     router.get('/owner/service', [OwnersController, 'show'])
+
+    //Mechanic
+    router.get('/mechanic/service', [MechanicController, 'getMechanicService'])
 
     // Vehicle
     router.post('/vehicle', [VehiclesController, 'create'])

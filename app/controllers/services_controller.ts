@@ -11,7 +11,7 @@ export default class ServicesController {
     return response.json(services);
   }
 
-  public async assignOwner({ response, request, auth }: HttpContext) {
+  public async assignVehicleOwner({ response, request, auth }: HttpContext) {
     const serviceId = request.param('serviceId');
     const user = auth.user!
 
@@ -37,5 +37,38 @@ export default class ServicesController {
     await user.related('relatedUsers').detach([serviceId]);
 
     return response.json(service);
+  }
+
+  public async addMechanicToService ({ response, request, auth }: HttpContext) {
+    const user = auth.user!
+    const data = request.only([
+      'name',
+      'type',
+      'description',
+      'email',
+    ])
+    const mechanic = await User.create({
+      name: data.name,
+      type: UserType.MECHANIC,
+      description: data.description,
+      email: data.email,
+      // password: cuid(),
+      password: data.email,
+    })
+
+    await user.related('relatedUsers').attach([mechanic.id]);
+
+    // TODO: notify mechanic by e-mail
+
+    return response.json(mechanic);
+  }
+
+  public async getMechanics({ response, auth }: HttpContext) {
+    const user = auth.user!
+
+    const assignedServices =
+      await user.related('relatedUsers').query().where('type', UserType.MECHANIC)
+
+    return response.json(assignedServices);
   }
 }
