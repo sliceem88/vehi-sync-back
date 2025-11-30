@@ -5,6 +5,7 @@ import ConstantController from '#controllers/constant_controller'
 import UserController from '#controllers/user_controller'
 import VehiclesController from '#controllers/vehicles_controller'
 import ServicesController from '#controllers/services_controller'
+import OwnersController from '#controllers/owner_controller.'
 
 
 
@@ -27,6 +28,9 @@ router.group(() => {
     router.post('/service/owner/:serviceId', [ServicesController, 'assignOwner'])
     router.get('/service/owner', [ServicesController, 'getAssignedServices'])
     router.delete('/service/owner/:serviceId', [ServicesController, 'deleteAssignedService'])
+
+    //Owners
+    router.get('/owner/service', [OwnersController, 'show'])
 
     // Vehicle
     router.post('/vehicle', [VehiclesController, 'create'])
