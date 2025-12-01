@@ -6,10 +6,20 @@ import { inject } from '@adonisjs/core'
 @inject()
 export default class UserController {
   async register({ request }: HttpContext) {
-    const data = await request.validateUsing(registerValidator)
-    const user = await User.create(data)
+    const email = request.param('email')
+    const password = request.param('password')
+    console.log('###', email, password);
+    try {
+      const data = await request.validateUsing(registerValidator)
+      const user = await User.create(data)
 
-    return User.accessTokens.create(user)
+      return User.accessTokens.create(user)
+    } catch (error) {
+      console.log(error.message)
+    }
+
+
+    return null
   }
 
   async login({ request }: HttpContext) {
