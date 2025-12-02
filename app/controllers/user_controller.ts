@@ -30,6 +30,7 @@ export default class UserController {
     return {
       ...data.toJSON(),
       userType: user.type,
+      fastLink: user.fastLink,
     }
   }
 

@@ -69,6 +69,14 @@ export default class User extends compose(BaseModel, AuthFinder, SoftDeletes) {
   @column.dateTime({ columnName: 'deleted_at' })
   declare deletedAt: DateTime | null
 
+  @column()
+  declare fastLink: string
+
+  @beforeCreate()
+  static assignFastLink(user: User) {
+    user.fastLink = cuid()
+  }
+
   @beforeCreate()
   static assignUuid(user: User) {
     user.id = randomUUID()
