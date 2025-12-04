@@ -7,6 +7,7 @@ import VehiclesController from '#controllers/vehicles_controller'
 import ServicesController from '#controllers/services_controller'
 import OwnersController from '#controllers/owner_controller.'
 import MechanicController from '#controllers/mechanic_controller'
+import FastlinkController from '#controllers/fastlink_controller'
 
 
 
@@ -37,6 +38,10 @@ router.group(() => {
 
     //Mechanic
     router.get('/mechanic/service', [MechanicController, 'getMechanicService'])
+
+    //Fastlink
+    router.get('/fastlink/:fastlink', [FastlinkController, 'getUser'])
+    router.post('/fastlink/connect/:fastLinkUserId', [FastlinkController, 'connectUsers'])
 
     // Vehicle
     router.post('/vehicle', [VehiclesController, 'create'])
