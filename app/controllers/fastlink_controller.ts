@@ -40,7 +40,6 @@ export default class FastlinkController {
       return response.json(user);
     } catch (error) {
       return ResponseApi.sendError(response, 'Users already connected', ExceptionCode.FASTLINK_EXISTS);
-      // return response.badRequest(ExceptionCode.FASTLINK_EXISTS);
     }
   }
 

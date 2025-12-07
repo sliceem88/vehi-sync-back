@@ -1,4 +1,4 @@
-import { HttpContext } from '@adonisjs/core/http'
+import type { Response } from '@adonisjs/core/http';
 
 type ApiResponseType<T> = {
   data?: T;
