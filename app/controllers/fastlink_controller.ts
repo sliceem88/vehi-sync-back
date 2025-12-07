@@ -2,6 +2,8 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { UserType } from '#enums/user_type'
+import { ResponseApi } from '#utilities/api_response'
+import { ExceptionCode } from '#exceptions/exception_code'
 
 @inject()
 export default class FastlinkController {
@@ -15,6 +17,12 @@ export default class FastlinkController {
       return response.notFound();
     }
 
+    const isConnectedAlready = await user.related('relatedTo').query().where('user_id', fastLinkUser.id).firstOrFail();
+
+    if(isConnectedAlready) {
+      return response.conflict();
+    }
+
     if(this.allowToConnect(user.type!, fastLinkUser.type!)) {
       return response.json(fastLinkUser);
     }
@@ -26,9 +34,14 @@ export default class FastlinkController {
     const user = auth.user!;
     const fastLinkUserId = request.param('fastLinkUserId');
 
-    await user.related('relatedTo').attach([fastLinkUserId]);
+    try {
+      await user.related('relatedTo').attach([fastLinkUserId]);
 
-    return response.json(user);
+      return response.json(user);
+    } catch (error) {
+      return ResponseApi.sendError(response, 'Users already connected', ExceptionCode.FASTLINK_EXISTS);
+      // return response.badRequest(ExceptionCode.FASTLINK_EXISTS);
+    }
   }
 
   // Rules to connect account
