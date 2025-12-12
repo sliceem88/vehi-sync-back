@@ -8,8 +8,10 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import env from '#start/env'
 import * as fs from 'node:fs'
-import path from 'node:path'
 import {unlink}  from "fs/promises"
+import { cuid } from '@adonisjs/core/helpers'
+
+export const LOCAL_UPLOAD_DIR = 'uploads';
 
 export class BucketService {
   private readonly s3Client: S3Client
@@ -102,18 +104,22 @@ export class BucketService {
     }
   }
 
-  createFilaPath(bucket: string, filePath: string) {
-    const keyName = path.basename(filePath);
+  createFilaPathName(bucket: string) {
+    const randomName = `${cuid()}.jpeg`;
+    const outputName = `${LOCAL_UPLOAD_DIR}/${randomName}`;
+    const bucketName = `${bucket}/${randomName}`;
 
-    return `${bucket}/${keyName}`;
+    return {
+      outputName,
+      bucketName,
+    };
   }
 
   /**
    * Upload a file to the bucket
    */
-  async uploadFile(bucket: string, filePath: string) {
+  async uploadFile(fileName: string, filePath: string) {
     const fileStream = fs.createReadStream(filePath);
-    const fileName = this.createFilaPath(bucket, filePath)
 
     try {
       const command = new PutObjectCommand({
@@ -124,8 +130,6 @@ export class BucketService {
 
       await this.s3Client.send(command)
       await unlink(filePath)
-
-      return fileName;
     } catch (error) {
       console.error('Error uploading file:', error)
       throw error
