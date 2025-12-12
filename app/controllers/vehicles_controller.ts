@@ -1,17 +1,21 @@
 import Vehicle from '#models/vehicle'
 import type { HttpContext } from '@adonisjs/core/http'
-import { BucketService } from '#services/bucket_service'
+import { BucketService, LOCAL_UPLOAD_DIR } from '#services/bucket_service'
 import { inject } from '@adonisjs/core'
 import { StatusCodes } from 'http-status-codes'
+import { OptimizeService } from '#services/optimize_service'
 
 @inject()
 export default class VehiclesController {
-  constructor(protected bucket: BucketService) {
+  constructor(
+    protected bucket: BucketService,
+    protected optimizeService: OptimizeService
+  ) {
   }
 
   public async create({ request, auth }: HttpContext) {
     const file = request.file('images');
-    console.log('###', file);
+    const user = auth.user!;
     let fileName = '';
 
     const data = request.only([
@@ -24,8 +28,11 @@ export default class VehiclesController {
     ])
 
     if(file) {
-      await file?.move('uploads')
-      fileName = await this.bucket.uploadFile(auth.user!.bucket!, file?.filePath!)
+      await file.move(LOCAL_UPLOAD_DIR);
+      const { outputName, bucketName } = this.bucket.createFilaPathName(user.bucket!)
+      await this.optimizeService.compressImage(file?.filePath!, outputName);
+      await this.bucket.uploadFile(bucketName, outputName);
+      fileName = bucketName;
     }
 
     return await Vehicle.create({
@@ -33,9 +40,9 @@ export default class VehiclesController {
       type: data.type,
       year: data.year,
       description: data.description,
-      images: {fileName: fileName},
+      images: { fileName: fileName },
       additionalInfo: data.additionalInfo,
-      userId: auth.user!.id
+      userId: user.id
     })
   }
 
