@@ -8,6 +8,7 @@ import ServicesController from '#controllers/services_controller'
 import OwnersController from '#controllers/owner_controller.'
 import MechanicController from '#controllers/mechanic_controller'
 import FastlinkController from '#controllers/fastlink_controller'
+import ServicesRequestController from '#controllers/service_request_controller'
 
 
 
@@ -33,6 +34,9 @@ router.group(() => {
     router.post('/service/mechanic/', [ServicesController, 'addMechanicToService'])
     router.get('/service/mechanic/', [ServicesController, 'getMechanics'])
 
+    //Service request assign
+    router.post('/service/request/:serviceId', [ServicesRequestController, 'makeAssignRequest'])
+
     //Owners
     router.get('/owner/service', [OwnersController, 'show'])
 
@@ -48,6 +52,7 @@ router.group(() => {
     router.get('/vehicle/all', [VehiclesController, 'getAll'])
     router.get('/vehicle/:id', [VehiclesController, 'show'])
     router.delete('/vehicle/:id', [VehiclesController, 'delete'])
+    router.put('/vehicle/:id', [VehiclesController, 'update'])
   })
     .middleware(middleware.auth())
 

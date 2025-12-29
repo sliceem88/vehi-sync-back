@@ -10,29 +10,21 @@ export default class VehiclesController {
   constructor(
     protected bucket: BucketService,
     protected optimizeService: OptimizeService
-  ) {
-  }
+  ) {}
 
   public async create({ request, auth }: HttpContext) {
-    const file = request.file('images');
-    const user = auth.user!;
-    let fileName = '';
+    const file = request.file('images')
+    const user = auth.user!
+    let fileName = ''
 
-    const data = request.only([
-      'name',
-      'type',
-      'year',
-      'description',
-      'images',
-      'additionalInfo',
-    ])
+    const data = request.only(['name', 'type', 'year', 'description', 'images', 'additionalInfo'])
 
-    if(file) {
-      await file.move(LOCAL_UPLOAD_DIR);
+    if (file) {
+      await file.move(LOCAL_UPLOAD_DIR)
       const { outputName, bucketName } = this.bucket.createFilaPathName(user.bucket!)
-      await this.optimizeService.compressImage(file?.filePath!, outputName);
-      await this.bucket.uploadFile(bucketName, outputName);
-      fileName = bucketName;
+      await this.optimizeService.compressImage(file?.filePath!, outputName)
+      await this.bucket.uploadFile(bucketName, outputName)
+      fileName = bucketName
     }
 
     return await Vehicle.create({
@@ -42,7 +34,7 @@ export default class VehiclesController {
       description: data.description,
       images: { fileName: fileName },
       additionalInfo: data.additionalInfo,
-      userId: user.id
+      userId: user.id,
     })
   }
 
@@ -57,14 +49,16 @@ export default class VehiclesController {
   }
 
   public async getAll({ auth, response }: HttpContext) {
-    const vehicles = await Vehicle.findManyBy({ userId: auth.user!.id})
+    const vehicles = await Vehicle.query()
+      .where('user_id', auth.user!.id)
+      .orderBy('created_at', 'desc')
 
     if (!vehicles) {
       return response.status(StatusCodes.NOT_FOUND).json({ message: 'Vehicle not found' })
     }
 
     for (const vehicle of vehicles) {
-      if(vehicle.images.fileName) {
+      if (vehicle.images.fileName) {
         vehicle.images.fileName = await this.bucket.getSignedUrlForFile(vehicle.images.fileName)
       }
     }
@@ -73,13 +67,36 @@ export default class VehiclesController {
   }
 
   public async delete({ params, response }: HttpContext) {
-    const vehicle  = await Vehicle.find(params.id);
+    const vehicle = await Vehicle.find(params.id)
 
     if (!vehicle) {
       return response.status(StatusCodes.NOT_FOUND).json({ message: 'Vehicle not found' })
     }
 
-    await vehicle.delete(); // Soft Delete
+    await vehicle.delete() // Soft Delete
 
-    return response.json(vehicle)  }
+    return response.json(vehicle)
+  }
+
+  public async update({ request, response }: HttpContext) {
+    const vehicle = await Vehicle.find(request.param('id'))
+
+    if (!vehicle) {
+      return response.status(StatusCodes.NOT_FOUND).json({ message: 'Vehicle not found' })
+    }
+
+    const updateData = request.only([
+      'name',
+      'type',
+      'year',
+      'description',
+      'images',
+      'additionalInfo',
+    ])
+
+    vehicle.merge(updateData)
+    await vehicle.save()
+
+    return response.json(await vehicle.refresh())
+  }
 }
