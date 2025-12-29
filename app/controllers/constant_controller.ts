@@ -9,8 +9,19 @@ export default class ConstantController {
       { key: 'owner', label: 'Vehicle Owner' },
       { key: 'service', label: 'Service Owner' },
       { key: 'mechanic', label: 'Mechanic' },
-    ]
+    ];
+    const vehicleTypes = [
+      { key: 'velo', label: 'Bicycle' },
+      { key: 'moto', label: 'Motorcycle' },
+      { key: 'light', label: 'Light Vehicle' },
+      { key: 'heavy', label: 'Heavy Vehicle' },
+      { key: 'tractor', label: 'Tractor' },
+      { key: 'trailer', label: 'Trailer' },
+    ];
 
-    return ctx.response.json(accountTypes)
+    return ctx.response.json({
+      accountTypes,
+      vehicleTypes,
+    })
   }
 }
