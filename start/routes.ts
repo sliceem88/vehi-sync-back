@@ -26,6 +26,9 @@ router.group(() => {
     router.get('/bucket/list', [BucketController, 'index'])
     router.get('/bucket/list/all', [BucketController, 'all'])
 
+    //User
+    router.put('/user', [UserController, 'updateProfile'])
+
     //Services
     router.get('/service/all', [ServicesController, 'show'])
     router.post('/service/owner/:serviceId', [ServicesController, 'assignVehicleOwner'])

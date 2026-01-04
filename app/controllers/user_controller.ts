@@ -6,9 +6,6 @@ import { inject } from '@adonisjs/core'
 @inject()
 export default class UserController {
   async register({ request }: HttpContext) {
-    const email = request.param('email')
-    const password = request.param('password')
-    console.log('###', email, password);
     try {
       const data = await request.validateUsing(registerValidator)
       const user = await User.create(data)
@@ -18,19 +15,22 @@ export default class UserController {
       console.log(error.message)
     }
 
-
     return null
   }
 
   async login({ request }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
     const user = await User.verifyCredentials(email, password)
-    const data = await User.accessTokens.create(user);
+    const data = await User.accessTokens.create(user)
 
     return {
       ...data.toJSON(),
       userType: user.type,
       fastLink: user.fastLink,
+      name: user.name,
+      surname: user.surname,
+      description: user.description,
+      companyName: user.companyName,
     }
   }
 
@@ -47,5 +47,16 @@ export default class UserController {
     return {
       user: auth.user,
     }
+  }
+
+  async updateProfile({ request, auth, response }: HttpContext) {
+    const user = auth.user!
+    const data = request.only(['description', 'name', 'surname', 'companyName'])
+
+    user.merge(data);
+
+    await user.save()
+
+    return response.status(200).send(await user.refresh())
   }
 }
