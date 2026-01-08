@@ -6,8 +6,8 @@ export default class ServiceRequests extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary()
-      table.uuid('owner_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
       table.uuid('service_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
+      table.uuid('vehicle_id').notNullable().references('id').inTable('vehicles').onDelete('CASCADE')
 
       table
         .boolean('approved_by_service')

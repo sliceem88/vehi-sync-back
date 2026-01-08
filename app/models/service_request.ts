@@ -4,13 +4,14 @@ import User from '#models/user'
 import * as relations from '@adonisjs/lucid/types/relations'
 import { randomUUID } from 'node:crypto'
 import { ServiceRequestStatus } from '#enums/service_request'
+import Vehicle from '#models/vehicle'
 
 export default class ServiceRequest extends BaseModel {
   @column({ isPrimary: true })
   declare id: string
 
-  @column({ columnName: 'owner_id' })
-  declare ownerId: string
+  @column({ columnName: 'vehicle_id' })
+  declare vehicleId: string
 
   @column({ columnName: 'service_id' })
   declare serviceId: string
@@ -22,6 +23,9 @@ export default class ServiceRequest extends BaseModel {
   declare serviceComment: string | null
 
   @column()
+  declare ownerComment: string | null
+
+  @column()
   declare viewedByOwner: boolean
 
   @column.dateTime({ autoCreate: true })
@@ -30,10 +34,10 @@ export default class ServiceRequest extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @belongsTo(() => User, {
-    foreignKey: 'ownerId',
+  @belongsTo(() => Vehicle, {
+    foreignKey: 'vehicleId',
   })
-  declare owner: relations.BelongsTo<typeof User>
+  declare vehicle: relations.BelongsTo<typeof Vehicle>
 
   @belongsTo(() => User, {
     foreignKey: 'serviceId',
