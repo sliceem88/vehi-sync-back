@@ -38,7 +38,7 @@ router.group(() => {
     router.get('/service/mechanic/', [ServicesController, 'getMechanics'])
 
     //Service request assign
-    router.post('/service/request/:serviceId', [ServicesRequestController, 'makeAssignRequest'])
+    router.post('/service/job/:serviceId', [ServicesRequestController, 'makeAssignRequest'])
 
     //Owners
     router.get('/owner/service', [OwnersController, 'show'])

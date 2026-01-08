@@ -13,8 +13,8 @@ export default class ReplaceApprovedWithStatusString extends BaseSchema {
 
       table.dropColumn('approved_by_service')
 
-      table.unique(['owner_id', 'service_id', 'status'], {
-        indexName: 'service_requests_owner_service_status_unique',
+      table.unique(['vehicle_id', 'service_id', 'status'], {
+        indexName: 'service_requests_vehicle_service_status_unique',
       })
     })
   }
@@ -22,7 +22,7 @@ export default class ReplaceApprovedWithStatusString extends BaseSchema {
   async down() {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropUnique(
-        ['owner_id', 'service_id', 'status'],
+        ['vehicle_id', 'service_id', 'status'],
         'service_requests_owner_service_status_unique'
       )
 
