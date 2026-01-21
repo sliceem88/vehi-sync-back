@@ -5,10 +5,10 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table
-        .string('owner_comment')
-        .nullable()
-        .comment('Owner comment - additional info')
+      table.uuid('owner_id')
+        .notNullable()
+        .references('id')
+        .inTable('users')
     })
   }
 

@@ -3,3 +3,9 @@ export enum ServiceRequestStatus {
   APPROVED = 'approved',
   DECLINED = 'declined',
 }
+
+export const ServiceRequestStatusLabels: Record<number, ServiceRequestStatus> = [
+  ServiceRequestStatus.PENDING,
+  ServiceRequestStatus.APPROVED,
+  ServiceRequestStatus.DECLINED,
+]
