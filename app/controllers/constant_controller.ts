@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
+import { ServiceRequestStatusLabels } from '#enums/service_request'
 
 @inject()
 export default class ConstantController {
@@ -22,6 +23,7 @@ export default class ConstantController {
     return ctx.response.json({
       accountTypes,
       vehicleTypes,
+      serviceRequestStatus: ServiceRequestStatusLabels,
     })
   }
 }

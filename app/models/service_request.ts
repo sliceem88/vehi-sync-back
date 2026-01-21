@@ -16,6 +16,9 @@ export default class ServiceRequest extends BaseModel {
   @column({ columnName: 'service_id' })
   declare serviceId: string
 
+  @column({ columnName: 'owner_id' })
+  declare ownerId: string
+
   @column()
   declare status: ServiceRequestStatus
 
@@ -43,6 +46,11 @@ export default class ServiceRequest extends BaseModel {
     foreignKey: 'serviceId',
   })
   declare service: relations.BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'ownerId',
+  })
+  declare owner: relations.BelongsTo<typeof User>
 
   @beforeCreate()
   static assignUuid(serviceRequest: ServiceRequest) {

@@ -31,17 +31,19 @@ router.group(() => {
 
     //Services
     router.get('/service/all', [ServicesController, 'show'])
-    router.post('/service/owner/:serviceId', [ServicesController, 'assignVehicleOwner'])
-    router.get('/service/owner', [ServicesController, 'getAssignedServices'])
+    // router.post('/service/owner/:serviceId', [ServicesController, 'assignVehicleOwner'])
+    router.get('/service/owner', [ServicesController, 'getAssignedOrRequestedOwnerWithVehicle'])
+    router.post('/service/owner/:serviceRequestId', [ServicesController, 'serviceRequestRespond'])
+
     router.delete('/service/owner/:serviceId', [ServicesController, 'deleteAssignedService'])
     router.post('/service/mechanic/', [ServicesController, 'addMechanicToService'])
     router.get('/service/mechanic/', [ServicesController, 'getMechanics'])
-
     //Service request assign
-    router.post('/service/job/:serviceId', [ServicesRequestController, 'makeAssignRequest'])
 
+    router.post('/service/job/:serviceId', [ServicesRequestController, 'makeAssignRequest'])
     //Owners
-    router.get('/owner/service', [OwnersController, 'show'])
+
+    router.get('/owner/service', [OwnersController, 'getAssignedOrRequestedServiceWithVehicle'])
 
     //Mechanic
     router.get('/mechanic/service', [MechanicController, 'getMechanicService'])
