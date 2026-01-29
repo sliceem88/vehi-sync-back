@@ -98,5 +98,7 @@ export default class ServicesController {
   public async getVehicleForJobs({ response, auth }: HttpContext) {
     const user = auth.user!
     const jobs = await ServiceRequest.query().where('serviceId', user.id).andWhere('status', ServiceRequestStatus.APPROVED)
+
+    return response.json(jobs)
   }
 }
