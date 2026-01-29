@@ -3,6 +3,7 @@ import User from '#models/user'
 import { UserType } from '#enums/user_type'
 import { inject } from '@adonisjs/core'
 import ServiceRequest from '#models/service_request'
+import { ServiceRequestStatus } from '#enums/service_request'
 
 @inject()
 export default class ServicesController {
@@ -92,5 +93,10 @@ export default class ServicesController {
       .where('type', UserType.MECHANIC)
 
     return response.json(assignedServices)
+  }
+
+  public async getVehicleForJobs({ response, auth }: HttpContext) {
+    const user = auth.user!
+    const jobs = await ServiceRequest.query().where('serviceId', user.id).andWhere('status', ServiceRequestStatus.APPROVED)
   }
 }
