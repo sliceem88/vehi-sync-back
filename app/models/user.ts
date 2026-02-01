@@ -72,6 +72,9 @@ export default class User extends compose(BaseModel, AuthFinder, SoftDeletes) {
   @column()
   declare fastLink: string
 
+  @column({ columnName: 'created_by_service' })
+  declare createdByService: boolean
+
   @beforeCreate()
   static assignFastLink(user: User) {
     user.fastLink = cuid()

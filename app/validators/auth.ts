@@ -13,7 +13,8 @@ export const registerValidator = vine.compile(
         return !match
       }),
     password: vine.string().minLength(8),
-    type: vine.enum(UserType)
+    type: vine.enum(UserType),
+    createdByService: vine.boolean()
   })
 )
 
