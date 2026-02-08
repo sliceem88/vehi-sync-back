@@ -44,7 +44,7 @@ export default class UserController {
     await auth.check()
 
     return {
-      user: auth.user,
+      data: auth.user,
     }
   }
 
