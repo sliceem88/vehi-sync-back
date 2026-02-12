@@ -1,30 +1,32 @@
+import * as fs from "node:fs";
+import { unlink } from "node:fs/promises";
+
+import { cuid } from "@adonisjs/core/helpers";
 import {
-  S3Client,
+  DeleteObjectCommand,
+  GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import env from '#start/env'
-import * as fs from 'node:fs'
-import {unlink}  from "fs/promises"
-import { cuid } from '@adonisjs/core/helpers'
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-export const LOCAL_UPLOAD_DIR = 'uploads';
+import env from "#start/env";
+
+export const LOCAL_UPLOAD_DIR = "uploads";
 
 export class BucketService {
-  private readonly s3Client: S3Client
-  private bucketName: string = 'vehiSyncBucket'
+  private readonly s3Client: S3Client;
+  private bucketName: string = "vehiSyncBucket";
 
   constructor() {
-    const endpoint = env.get('BUCKET_ENDPOINT')
-    const region = env.get('BUCKET_REGION')
-    const keyId = env.get('BUCKET_KEY_ID')
-    const appKey = env.get('BUCKET_APPLICATION_KEY')
+    const endpoint = env.get("BUCKET_ENDPOINT");
+    const region = env.get("BUCKET_REGION");
+    const keyId = env.get("BUCKET_KEY_ID");
+    const appKey = env.get("BUCKET_APPLICATION_KEY");
 
     if (!endpoint || !region || !keyId || !appKey) {
-      throw new Error('Missing required Backblaze B2 environment variables')
+      throw new Error("Missing required Backblaze B2 environment variables");
     }
 
     this.s3Client = new S3Client({
@@ -34,7 +36,7 @@ export class BucketService {
         accessKeyId: keyId,
         secretAccessKey: appKey,
       },
-    })
+    });
   }
 
   /**
@@ -43,26 +45,27 @@ export class BucketService {
   async listFiles(prefix?: string, maxKeys: number = 1000) {
     try {
       const command = new ListObjectsV2Command({
-        Bucket: env.get('BUCKET_APPLICATION_KEY_NAME'),
+        Bucket: env.get("BUCKET_APPLICATION_KEY_NAME"),
         Prefix: prefix,
         MaxKeys: maxKeys,
-      })
+      });
 
-      const response = await this.s3Client.send(command)
+      const response = await this.s3Client.send(command);
 
       return {
-        files: response.Contents?.map((file) => ({
-          key: file.Key,
-          size: file.Size,
-          lastModified: file.LastModified,
-          etag: file.ETag,
-        })) || [],
+        files:
+          response.Contents?.map((file) => ({
+            key: file.Key,
+            size: file.Size,
+            lastModified: file.LastModified,
+            etag: file.ETag,
+          })) || [],
         isTruncated: response.IsTruncated,
         nextContinuationToken: response.NextContinuationToken,
-      }
+      };
     } catch (error) {
-      console.error('Error listing files:', error)
-      throw error
+      console.error("Error listing files:", error);
+      throw error;
     }
   }
 
@@ -70,8 +73,8 @@ export class BucketService {
    * List all files with pagination support
    */
   async listAllFiles(prefix?: string) {
-    const allFiles: any[] = []
-    let continuationToken: string | undefined
+    const allFiles: any[] = [];
+    let continuationToken: string | undefined;
 
     try {
       do {
@@ -79,9 +82,9 @@ export class BucketService {
           Bucket: this.bucketName,
           Prefix: prefix,
           ContinuationToken: continuationToken,
-        })
+        });
 
-        const response = await this.s3Client.send(command)
+        const response = await this.s3Client.send(command);
 
         if (response.Contents) {
           allFiles.push(
@@ -90,17 +93,17 @@ export class BucketService {
               size: file.Size,
               lastModified: file.LastModified,
               etag: file.ETag,
-            }))
-          )
+            })),
+          );
         }
 
-        continuationToken = response.NextContinuationToken
-      } while (continuationToken)
+        continuationToken = response.NextContinuationToken;
+      } while (continuationToken);
 
-      return allFiles
+      return allFiles;
     } catch (error) {
-      console.error('Error listing all files:', error)
-      throw error
+      console.error("Error listing all files:", error);
+      throw error;
     }
   }
 
@@ -126,13 +129,13 @@ export class BucketService {
         Bucket: this.bucketName,
         Key: fileName,
         Body: fileStream,
-      })
+      });
 
-      await this.s3Client.send(command)
-      await unlink(filePath)
+      await this.s3Client.send(command);
+      await unlink(filePath);
     } catch (error) {
-      console.error('Error uploading file:', error)
-      throw error
+      console.error("Error uploading file:", error);
+      throw error;
     }
   }
 
@@ -144,13 +147,13 @@ export class BucketService {
       const command = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-      })
+      });
 
-      const response = await this.s3Client.send(command)
-      return response
+      const response = await this.s3Client.send(command);
+      return response;
     } catch (error) {
-      console.error('Error getting file:', error)
-      throw error
+      console.error("Error getting file:", error);
+      throw error;
     }
   }
 
@@ -161,7 +164,7 @@ export class BucketService {
         Bucket: this.bucketName,
         Key: fileKey,
       }),
-      { expiresIn: 360 } // 1 hour
+      { expiresIn: 360 }, // 1 hour
     );
   }
 
@@ -173,13 +176,13 @@ export class BucketService {
       const command = new DeleteObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-      })
+      });
 
-      const response = await this.s3Client.send(command)
-      return response
+      const response = await this.s3Client.send(command);
+      return response;
     } catch (error) {
-      console.error('Error deleting file:', error)
-      throw error
+      console.error("Error deleting file:", error);
+      throw error;
     }
   }
 
@@ -191,13 +194,13 @@ export class BucketService {
       const command = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-      })
+      });
 
-      const url = await getSignedUrl(this.s3Client, command, { expiresIn })
-      return url
+      const url = await getSignedUrl(this.s3Client, command, { expiresIn });
+      return url;
     } catch (error) {
-      console.error('Error generating presigned URL:', error)
-      throw error
+      console.error("Error generating presigned URL:", error);
+      throw error;
     }
   }
 }

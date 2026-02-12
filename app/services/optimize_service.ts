@@ -1,4 +1,4 @@
-import sharp from 'sharp'
+import sharp from "sharp";
 
 export class OptimizeService {
   async compressImage(filePath: string, outputName: string): Promise<void> {
@@ -10,7 +10,7 @@ export class OptimizeService {
       .jpeg({
         quality: 75,
         progressive: true,
-        mozjpeg: true
+        mozjpeg: true,
       })
       .toFile(outputName);
   }

@@ -1,25 +1,25 @@
-import { BaseSchema } from '@adonisjs/lucid/schema'
+import { BaseSchema } from "@adonisjs/lucid/schema";
 
 export default class ChangeYearToDatetimeInVehicles extends BaseSchema {
-  protected tableName = 'vehicles'
+  protected tableName = "vehicles";
 
-  public async up () {
+  public async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.dropColumn('year')
-    })
+      table.dropColumn("year");
+    });
 
     this.schema.alterTable(this.tableName, (table) => {
-      table.timestamp('year', { useTz: true })
-    })
+      table.timestamp("year", { useTz: true });
+    });
   }
 
-  public async down () {
+  public async down() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.dropColumn('year')
-    })
+      table.dropColumn("year");
+    });
 
     this.schema.alterTable(this.tableName, (table) => {
-      table.bigInteger('year')
-    })
+      table.bigInteger("year");
+    });
   }
 }

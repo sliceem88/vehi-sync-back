@@ -1,59 +1,66 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, beforeCreate } from '@adonisjs/lucid/orm'
-import User from '#models/user'
-import * as relations from '@adonisjs/lucid/types/relations'
-import { randomUUID } from 'node:crypto'
-import { ServiceRequestStatus } from '#enums/service_request'
-import Vehicle from '#models/vehicle'
+import { randomUUID } from "node:crypto";
+
+import {
+  BaseModel,
+  beforeCreate,
+  belongsTo,
+  column,
+} from "@adonisjs/lucid/orm";
+import * as relations from "@adonisjs/lucid/types/relations";
+import { DateTime } from "luxon";
+
+import { ServiceRequestStatus } from "#enums/service_request";
+import User from "#models/user";
+import Vehicle from "#models/vehicle";
 
 export default class ServiceRequest extends BaseModel {
   @column({ isPrimary: true })
-  declare id: string
+  declare id: string;
 
-  @column({ columnName: 'vehicle_id' })
-  declare vehicleId: string
+  @column({ columnName: "vehicle_id" })
+  declare vehicleId: string | null;
 
-  @column({ columnName: 'service_id' })
-  declare serviceId: string
+  @column({ columnName: "service_id" })
+  declare serviceId: string;
 
-  @column({ columnName: 'owner_id' })
-  declare ownerId: string
-
-  @column()
-  declare status: ServiceRequestStatus
+  @column({ columnName: "owner_id" })
+  declare ownerId: string;
 
   @column()
-  declare serviceComment: string | null
+  declare status: ServiceRequestStatus;
 
   @column()
-  declare ownerComment: string | null
+  declare serviceComment: string | null;
 
   @column()
-  declare viewedByOwner: boolean
+  declare ownerComment: string | null;
+
+  @column()
+  declare viewedByOwner: boolean;
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare updatedAt: DateTime;
 
   @belongsTo(() => Vehicle, {
-    foreignKey: 'vehicleId',
+    foreignKey: "vehicleId",
   })
-  declare vehicle: relations.BelongsTo<typeof Vehicle>
+  declare vehicle: relations.BelongsTo<typeof Vehicle>;
 
   @belongsTo(() => User, {
-    foreignKey: 'serviceId',
+    foreignKey: "serviceId",
   })
-  declare service: relations.BelongsTo<typeof User>
+  declare service: relations.BelongsTo<typeof User>;
 
   @belongsTo(() => User, {
-    foreignKey: 'ownerId',
+    foreignKey: "ownerId",
   })
-  declare owner: relations.BelongsTo<typeof User>
+  declare owner: relations.BelongsTo<typeof User>;
 
   @beforeCreate()
   static assignUuid(serviceRequest: ServiceRequest) {
-    serviceRequest.id = randomUUID()
+    serviceRequest.id = randomUUID();
   }
 }
