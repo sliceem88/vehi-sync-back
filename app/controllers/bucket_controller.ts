@@ -5,7 +5,7 @@ import { BucketService } from "#services/bucket_service";
 import { ResponseApi } from "#utilities/api_response";
 
 @inject()
-export class BucketController {
+export default class BucketController {
   constructor(protected bucket: BucketService) {}
 
   async index() {
