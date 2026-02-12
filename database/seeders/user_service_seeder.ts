@@ -1,7 +1,8 @@
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import User from '#models/user'
-import { UserType } from '#enums/user_type'
-import { faker } from '@faker-js/faker'
+import { BaseSeeder } from "@adonisjs/lucid/seeders";
+import { faker } from "@faker-js/faker";
+
+import { UserType } from "#enums/user_type";
+import User from "#models/user";
 
 export default class ServiceUsersSeeder extends BaseSeeder {
   public async run() {
@@ -9,11 +10,11 @@ export default class ServiceUsersSeeder extends BaseSeeder {
       name: faker.person.firstName(),
       surname: faker.person.lastName(),
       email: faker.internet.email().toLowerCase(),
-      password: 'password123', // or hash if User model handles hashing
+      password: "password123", // or hash if User model handles hashing
       type: UserType.SERVICE,
       companyName: faker.company.name(),
-    }))
+    }));
 
-    await User.createMany(serviceUsers)
+    await User.createMany(serviceUsers);
   }
 }

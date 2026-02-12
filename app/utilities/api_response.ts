@@ -1,4 +1,4 @@
-import type { Response } from '@adonisjs/core/http';
+import type { Response } from "@adonisjs/core/http";
 
 type ApiResponseType<T> = {
   data?: T;
@@ -9,18 +9,15 @@ type ApiResponseType<T> = {
   meta?: {
     page: number;
     per_page: number;
-  }
-}
+  };
+};
 
 /**
  * API Response Utility Class
  * Provides standardized REST API responses with best practices
  */
 export class ResponseApi {
-  static success<T>(
-    data: T,
-    meta = undefined
-  ): ApiResponseType<T> {
+  static success<T>(data: T, meta = undefined): ApiResponseType<T> {
     return {
       data,
       meta,
@@ -34,8 +31,8 @@ export class ResponseApi {
     return {
       data: [],
       error: {
-        message: errorMessage || 'An error occurred',
-        code: errorCode
+        message: errorMessage || "An error occurred",
+        code: errorCode,
       },
     };
   }
@@ -44,10 +41,10 @@ export class ResponseApi {
     response: Response,
     errorMessage: string,
     statusCode: number = 400,
-    errorCode?: number
+    errorCode?: number,
   ) {
-    return response.status(statusCode).json(
-      this.error(errorMessage, errorCode)
-    );
+    return response
+      .status(statusCode)
+      .json(this.error(errorMessage, errorCode));
   }
 }

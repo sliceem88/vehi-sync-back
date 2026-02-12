@@ -1,40 +1,57 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, beforeCreate } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import Job from '#models/job'
-import { SoftDeletes } from 'adonis-lucid-soft-deletes'
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from "node:crypto";
+
+import {
+  BaseModel,
+  beforeCreate,
+  belongsTo,
+  column,
+} from "@adonisjs/lucid/orm";
+import type { BelongsTo } from "@adonisjs/lucid/types/relations";
+import { SoftDeletes } from "adonis-lucid-soft-deletes";
+import { DateTime } from "luxon";
+
+import { JobPriority } from "#enums/job_status";
+import Job from "#models/job";
+import User from "#models/user";
 
 export default class Task extends SoftDeletes(BaseModel) {
   @column({ isPrimary: true })
-  declare id: string
+  declare id: string;
 
   @column()
-  declare jobId: string
+  declare jobId: string;
 
-  @column({ columnName: 'mechanic_id' })
-  declare mechanicId: string
-
-  @column()
-  declare description: string | null
+  @column({ columnName: "mechanic_id" })
+  declare mechanicId: string;
 
   @column()
-  declare status: string
+  declare description: string | null;
+
+  @column()
+  declare status: string;
 
   @belongsTo(() => Job)
-  declare job: BelongsTo<typeof Job>
+  declare job: BelongsTo<typeof Job>;
+
+  @belongsTo(() => User, {
+    foreignKey: "mechanicId",
+  })
+  declare mechanic: BelongsTo<typeof User>;
+
+  @column()
+  declare priority: JobPriority;
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare updatedAt: DateTime;
 
   @column.dateTime()
-  declare deletedAt: DateTime | null
+  declare deletedAt: DateTime | null;
 
   @beforeCreate()
   static assignUuid(task: Task) {
-    task.id = randomUUID()
+    task.id = randomUUID();
   }
 }

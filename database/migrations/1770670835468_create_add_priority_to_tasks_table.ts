@@ -1,17 +1,21 @@
 import { BaseSchema } from "@adonisjs/lucid/schema";
 
 export default class extends BaseSchema {
-  protected tableName = "users";
+  protected tableName = "tasks";
 
   async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.boolean("created_by_service").notNullable().defaultTo(false);
+      table
+        .string("priority")
+        .notNullable()
+        .defaultTo("low")
+        .comment("Job priorities: low | medium | high");
     });
   }
 
   async down() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.dropColumn("created_by_service");
+      table.dropColumn("priority");
     });
   }
 }
