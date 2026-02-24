@@ -119,4 +119,11 @@ export default class VehiclesController {
 
     return response.json(await vehicle.refresh());
   }
+
+  public async getByOwnerId({ params, response }: HttpContext) {
+    const ownerId = params.id;
+    const vehicleList = await Vehicle.query().where("userId", ownerId);
+
+    return response.json({ data: vehicleList });
+  }
 }

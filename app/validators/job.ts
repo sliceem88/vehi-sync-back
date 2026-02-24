@@ -22,3 +22,13 @@ export const jobValidator = vine.compile(
       .minLength(1), // optional but usually sensible
   }),
 );
+
+export const userValidator = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+
+    name: vine.string().trim().minLength(1).optional(),
+
+    surname: vine.string().trim().minLength(1).optional(),
+  }),
+);

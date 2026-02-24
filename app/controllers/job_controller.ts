@@ -5,38 +5,29 @@ import { HttpContext } from "@adonisjs/core/http";
 import { DateTime } from "luxon";
 
 import { JobPriority, JobStatus } from "#enums/job_status";
-import { ServiceRequestStatus } from "#enums/service_request";
+import UserTypeNotFoundException from "#exceptions/user_type_not_found";
 import Job from "#models/job";
 import ServiceRequest from "#models/service_request";
 import Task from "#models/task";
-import User from "#models/user";
 import Vehicle from "#models/vehicle";
-import { jobValidator } from "#validators/job";
+import { JobService } from "#services/job_service";
+import { jobValidator, userValidator } from "#validators/job";
 
 @inject()
 export default class JobController {
+  constructor(protected jobService: JobService) {}
+
   public async createOwnerWithServiceAssigned({
     request,
     response,
     auth,
   }: HttpContext) {
     const service = auth.user!;
-    const data = request.only(["email"]);
-
-    const owner = await User.create({
-      email: data.email,
-      password: randomUUID(),
-      createdByService: true,
-    });
-
-    await ServiceRequest.create({
-      vehicleId: null,
-      serviceId: service.id,
-      status: ServiceRequestStatus.APPROVED,
-      viewedByOwner: false,
-      serviceComment: `Create by service: ${service.companyName}`,
-      ownerId: owner.id,
-    });
+    const data = await request.validateUsing(userValidator);
+    const owner = await this.jobService.assignOwnerAndServiceRequest(
+      data,
+      service,
+    );
 
     return response.json({
       data: owner,
@@ -120,6 +111,10 @@ export default class JobController {
     const service = auth.user!;
     // service | owner
     const userType = request.param("userType"); // TODO: add validation
+
+    if (!userType) {
+      throw new UserTypeNotFoundException();
+    }
 
     const jobs = await Job.query()
       .where(`${userType}Id`, service.id)

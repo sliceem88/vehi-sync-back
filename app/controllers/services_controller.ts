@@ -49,6 +49,9 @@ export default class ServicesController {
       .where({
         serviceId: user.id,
       })
+      .andWhereNot({
+        status: ServiceRequestStatus.DECLINED,
+      })
       .preload("vehicle", (q) => {
         q.select(["id", "name", "type", "images"]);
       })
