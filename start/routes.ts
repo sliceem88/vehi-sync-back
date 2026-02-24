@@ -65,14 +65,14 @@ router
           ServicesController,
           "getVehicleForJobs",
         ]);
-        //Service request assign
 
+        //Service request assign
         router.post("/service/job/:serviceId", [
           ServicesRequestController,
           "makeAssignRequest",
         ]);
-        //Owners
 
+        //Owners
         router.get("/owner/service", [
           OwnersController,
           "getAssignedOrRequestedServiceWithVehicle",
@@ -93,7 +93,6 @@ router
 
         //Job
         router.post("/job", [JobController, "createJob"]);
-        router.get("/jobs/:userType", [JobController, "getJobs"]);
         router.get("/job/:id", [JobController, "getJobById"]);
         router.post("/job/owner", [
           JobController,
@@ -103,10 +102,12 @@ router
           JobController,
           "assignVehicleToOwnerByService",
         ]);
+        router.get("/jobs/:userType", [JobController, "getJobs"]);
 
         // Vehicle
         router.post("/vehicle", [VehiclesController, "create"]);
         router.get("/vehicle/all", [VehiclesController, "getAll"]);
+        router.get("/vehicle/owner/:id", [VehiclesController, "getByOwnerId"]);
         router.get("/vehicle/:id", [VehiclesController, "show"]);
         router.delete("/vehicle/:id", [VehiclesController, "delete"]);
         router.put("/vehicle/:id", [VehiclesController, "update"]);
